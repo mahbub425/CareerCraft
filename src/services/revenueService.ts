@@ -501,6 +501,29 @@ export const revenueService = {
     ]);
   },
 
+  cancelPaymentSubscription: async (payment: PaymentRequestDoc) => {
+    try {
+      const result = await databases.listDocuments<SubscriptionDoc>(databaseId, collections.subscriptions, [
+        Query.equal('user_id', payment.user_id),
+        Query.equal('plan_id', payment.plan_id),
+        Query.equal('status', 'Active'),
+        Query.orderDesc('expires_at'),
+        Query.limit(5),
+      ]);
+
+      const matching = result.documents.find((subscription) => subscription.plan_name === payment.plan_name) || result.documents[0];
+      if (!matching) return null;
+
+      return await databases.updateDocument<SubscriptionDoc>(databaseId, collections.subscriptions, matching.$id, {
+        status: 'Cancelled',
+        expires_at: now(),
+      });
+    } catch (error) {
+      if (isMissingCollection(error)) return null;
+      throw error;
+    }
+  },
+
   approvePayment: async (payment: PaymentRequestDoc, note = '') => {
     const plans = await revenueService.listPlans(false);
     const plan = plans.documents.find((item) => getPlanKey(item) === payment.plan_id || item.$id === payment.plan_id || item.name === payment.plan_name);
@@ -539,6 +562,10 @@ export const revenueService = {
   },
 
   rejectPayment: async (payment: PaymentRequestDoc, note = '') => {
+    if (payment.status === 'approved') {
+      await revenueService.cancelPaymentSubscription(payment);
+    }
+
     const updated = await databases.updateDocument<PaymentRequestDoc>(databaseId, collections.paymentRequests, payment.$id, {
       status: 'rejected',
       admin_note: note,

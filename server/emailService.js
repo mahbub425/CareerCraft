@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 const escapeHtml = (value) => String(value || '')
   .replace(/&/g, '&amp;')
@@ -47,10 +48,94 @@ const getHtml = ({ type, payment, expiresAt, appUrl }) => {
   `;
 };
 
-export const sendPaymentStatusEmail = async ({ type, payment, expiresAt }, env = process.env) => {
+const parseSender = (value = '') => {
+  const match = String(value).match(/^(.*)<(.+)>$/);
+  if (!match) return { email: String(value).trim(), name: undefined };
+  return {
+    name: match[1].trim() || undefined,
+    email: match[2].trim(),
+  };
+};
+
+const sendWithBrevo = async ({ type, payment, expiresAt }, env) => {
+  const apiKey = env.BREVO_API_KEY || env.BREVO_SMTP_KEY;
+  const fromValue = env.BREVO_FROM_EMAIL || env.EMAIL_FROM;
+  if (!apiKey || !fromValue) {
+    console.warn('Brevo email skipped: BREVO_API_KEY and EMAIL_FROM/BREVO_FROM_EMAIL are required.');
+    return { skipped: true, provider: 'brevo' };
+  }
+
+  const subject = getSubject(type, payment);
+  const htmlContent = getHtml({ type, payment, expiresAt, appUrl: env.APP_URL || env.OPENROUTER_SITE_URL || 'http://localhost:5173' });
+  const sender = parseSender(fromValue);
+  const replyTo = env.ADMIN_NOTIFICATION_EMAIL ? parseSender(env.ADMIN_NOTIFICATION_EMAIL) : undefined;
+
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'api-key': apiKey,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender,
+      to: [{ email: payment.user_email, name: payment.user_name || undefined }],
+      replyTo,
+      subject,
+      htmlContent,
+      tags: [`payment_${type}`],
+      headers: {
+        'X-Payment-ID': String(payment.$id || payment.transaction_id || ''),
+      },
+    }),
+  });
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.message || `Brevo email failed with status ${response.status}.`);
+  }
+  return { ...result, provider: 'brevo' };
+};
+
+const sendWithBrevoSmtp = async ({ type, payment, expiresAt }, env) => {
+  const host = env.BREVO_SMTP_HOST || 'smtp-relay.brevo.com';
+  const port = Number(env.BREVO_SMTP_PORT || 587);
+  const user = env.BREVO_SMTP_USER;
+  const pass = env.BREVO_SMTP_PASS || env.BREVO_SMTP_PASSWORD;
+  const from = env.BREVO_FROM_EMAIL || env.EMAIL_FROM;
+
+  if (!user || !pass || !from) {
+    console.warn('Brevo SMTP email skipped: BREVO_SMTP_USER, BREVO_SMTP_PASS, and EMAIL_FROM are required.');
+    return { skipped: true, provider: 'brevo-smtp' };
+  }
+
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
+
+  const info = await transporter.sendMail({
+    from,
+    to: payment.user_email,
+    replyTo: env.ADMIN_NOTIFICATION_EMAIL || undefined,
+    subject: getSubject(type, payment),
+    html: getHtml({ type, payment, expiresAt, appUrl: env.APP_URL || env.OPENROUTER_SITE_URL || 'http://localhost:5173' }),
+  });
+
+  return {
+    provider: 'brevo-smtp',
+    messageId: info.messageId,
+    accepted: info.accepted,
+    rejected: info.rejected,
+  };
+};
+
+const sendWithResend = async ({ type, payment, expiresAt }, env) => {
   if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
     console.warn('Resend email skipped: RESEND_API_KEY or RESEND_FROM_EMAIL is missing.');
-    return { skipped: true };
+    return { skipped: true, provider: 'resend' };
   }
 
   const resend = new Resend(env.RESEND_API_KEY);
@@ -74,5 +159,24 @@ export const sendPaymentStatusEmail = async ({ type, payment, expiresAt }, env =
   );
 
   if (error) throw new Error(error.message || 'Resend email failed.');
-  return data;
+  return { ...data, provider: 'resend' };
+};
+
+export const sendPaymentStatusEmail = async ({ type, payment, expiresAt }, env = process.env) => {
+  const provider = String(env.EMAIL_PROVIDER || '').toLowerCase();
+
+  if (provider === 'brevo-smtp' || env.BREVO_SMTP_USER) {
+    return sendWithBrevoSmtp({ type, payment, expiresAt }, env);
+  }
+
+  if (provider === 'brevo' || env.BREVO_API_KEY || env.BREVO_SMTP_KEY) {
+    return sendWithBrevo({ type, payment, expiresAt }, env);
+  }
+
+  if (provider === 'resend' || env.RESEND_API_KEY) {
+    return sendWithResend({ type, payment, expiresAt }, env);
+  }
+
+  console.warn('Payment email skipped: configure EMAIL_PROVIDER=brevo with BREVO_API_KEY, or Resend env values.');
+  return { skipped: true };
 };
