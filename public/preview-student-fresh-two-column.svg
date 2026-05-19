@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1018" viewBox="0 0 720 1018" role="img" aria-labelledby="title desc">
+  <title id="title">Student and fresh graduate two column CV preview</title>
+  <desc id="desc">A CV page with a dark left sidebar and clean right content column.</desc>
+  <rect width="720" height="1018" fill="#f8fafc"/>
+  <rect x="46" y="38" width="628" height="942" rx="18" fill="#ffffff"/>
+  <rect x="46" y="38" width="218" height="942" rx="18" fill="#12324a"/>
+  <path d="M264 38h392c9.9 0 18 8.1 18 18v906c0 9.9-8.1 18-18 18H264z" fill="#ffffff"/>
+  <rect x="84" y="82" width="112" height="112" rx="18" fill="#ffffff" opacity=".18"/>
+  <circle cx="140" cy="126" r="28" fill="#b7e4d8"/>
+  <path d="M98 177c9-24 27-36 42-36s33 12 42 36" fill="#b7e4d8"/>
+  <rect x="84" y="226" width="132" height="18" rx="9" fill="#ffffff"/>
+  <rect x="84" y="256" width="104" height="10" rx="5" fill="#b7e4d8"/>
+  <rect x="84" y="318" width="112" height="10" rx="5" fill="#ffffff"/>
+  <rect x="84" y="339" width="144" height="2" rx="1" fill="#49b69f"/>
+  <rect x="84" y="364" width="130" height="8" rx="4" fill="#e8f7f3" opacity=".95"/>
+  <rect x="84" y="386" width="108" height="8" rx="4" fill="#e8f7f3" opacity=".8"/>
+  <rect x="84" y="408" width="122" height="8" rx="4" fill="#e8f7f3" opacity=".7"/>
+  <rect x="84" y="474" width="78" height="10" rx="5" fill="#ffffff"/>
+  <rect x="84" y="495" width="144" height="2" rx="1" fill="#49b69f"/>
+  <rect x="84" y="520" width="64" height="24" rx="12" fill="#ffffff" opacity=".14" stroke="#ffffff" stroke-opacity=".18"/>
+  <rect x="156" y="520" width="68" height="24" rx="12" fill="#ffffff" opacity=".14" stroke="#ffffff" stroke-opacity=".18"/>
+  <rect x="84" y="554" width="92" height="24" rx="12" fill="#ffffff" opacity=".14" stroke="#ffffff" stroke-opacity=".18"/>
+  <rect x="304" y="84" width="224" height="20" rx="10" fill="#12324a"/>
+  <rect x="304" y="124" width="286" height="3" rx="1.5" fill="#49b69f"/>
+  <rect x="304" y="154" width="298" height="8" rx="4" fill="#64748b" opacity=".7"/>
+  <rect x="304" y="176" width="254" height="8" rx="4" fill="#64748b" opacity=".45"/>
+  <rect x="304" y="237" width="104" height="12" rx="6" fill="#12324a"/>
+  <rect x="304" y="264" width="322" height="3" rx="1.5" fill="#49b69f"/>
+  <rect x="304" y="292" width="222" height="12" rx="6" fill="#172033"/>
+  <rect x="552" y="294" width="74" height="8" rx="4" fill="#94a3b8"/>
+  <rect x="304" y="322" width="168" height="8" rx="4" fill="#64748b" opacity=".65"/>
+  <rect x="304" y="344" width="84" height="8" rx="4" fill="#64748b" opacity=".45"/>
+  <rect x="304" y="405" width="166" height="12" rx="6" fill="#12324a"/>
+  <rect x="304" y="432" width="322" height="3" rx="1.5" fill="#49b69f"/>
+  <rect x="304" y="460" width="218" height="12" rx="6" fill="#172033"/>
+  <rect x="552" y="462" width="74" height="8" rx="4" fill="#94a3b8"/>
+  <rect x="304" y="490" width="280" height="8" rx="4" fill="#64748b" opacity=".65"/>
+  <rect x="304" y="512" width="252" height="8" rx="4" fill="#64748b" opacity=".45"/>
+  <rect x="304" y="574" width="132" height="12" rx="6" fill="#12324a"/>
+  <rect x="304" y="601" width="322" height="3" rx="1.5" fill="#49b69f"/>
+  <rect x="304" y="629" width="188" height="12" rx="6" fill="#172033"/>
+  <rect x="304" y="659" width="286" height="8" rx="4" fill="#64748b" opacity=".65"/>
+  <rect x="304" y="681" width="232" height="8" rx="4" fill="#64748b" opacity=".45"/>
+  <rect x="304" y="746" width="116" height="12" rx="6" fill="#12324a"/>
+  <rect x="304" y="773" width="322" height="3" rx="1.5" fill="#49b69f"/>
+  <rect x="304" y="801" width="208" height="12" rx="6" fill="#172033"/>
+  <rect x="304" y="831" width="296" height="8" rx="4" fill="#64748b" opacity=".65"/>
+  <rect x="304" y="853" width="240" height="8" rx="4" fill="#64748b" opacity=".45"/>
+</svg>
